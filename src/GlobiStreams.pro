@@ -5,8 +5,8 @@
 TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
-INCLUDEPATH += "../libs/include"
-LIBS += -L"../libs/lib" -lQSingleApplication -lGlobiUtils
+INCLUDEPATH += "../libs/QtSingleApplication/src" "../libs/GlobiUtils/src"
+LIBS += -L"../libs/QtSingleApplication/lib" -L"../libs/GlobiUtils/lib" -lQSingleApplication -lGlobiUtils
 QT += network webkit
 
 # Input
