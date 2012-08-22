@@ -8,6 +8,9 @@ ChatBrowser::ChatBrowser(QWidget * parent) : QTabWidget(parent)
 
     QObject::connect(this, SIGNAL(tabCloseRequested(int)),
                      this, SLOT(onTabCloseRequested(int)));
+
+    QObject::connect(this, SIGNAL(linkClicked(const QUrl &)),
+                     this, SLOT(onLinkClicked(const QUrl &)));
 }
 
 ChatBrowser::~ChatBrowser()

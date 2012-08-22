@@ -8,6 +8,7 @@
 #include <QWebFrame>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QDesktopServices>
 #include "Global.h"
 
 class CookieJar : public QNetworkCookieJar
@@ -36,6 +37,7 @@ class ChatBrowser : public QTabWidget
     private slots :
         void onTabCloseRequested(int index);
         void openChat(const QString & streamUrl, const QString & streamName);
+        void onLinkClicked(const QUrl & url) { QDesktopServices::openUrl(url); }
 
     private :
         QList <QWebView *> webPages;
