@@ -56,6 +56,8 @@ void MainUi::loadConfig()
     {
         confs = GlobiUtils::getConfFromFile(&confFile);
         mediaPlayerPath = confs.value(CACHE_KEY_PLAYER_PATH, DEFAULT_PLAYER_PATH);
+        gomAccount.username = confs.value(CACHE_KEY_GOM_USERNAME, QString());
+        gomAccount.password = confs.value(CACHE_KEY_GOM_PASSWORD, QString());
         QString cookieString(confs.value(CACHE_KEY_COOKIES, QString()));
         QList <QNetworkCookie> cookies;
         foreach(const QString & cookie, cookieString.split(CACHE_COOKIES_SEPARATOR))
@@ -110,19 +112,31 @@ void MainUi::unPackStream(const QVariant & data)
     {
         QVariantList streamAttrs(streamData.toList());
         Stream stream(streamAttrs.at(0).toString(), streamAttrs.at(1).toString());
-        stream.online = streamAttrs.at(2).toBool();
+        stream.online = qvariant_cast<int>(streamAttrs.at(2));
         stream.qualities = streamAttrs.at(3).toStringList();
         streams << stream;
     }
 
     foreach(const Stream & stream, streams)
-        if(stream.online && !streamTable->lastStates().value(stream.url, false))
+        if(stream.online == Online && streamTable->lastStates().value(stream.url, Offline) != Online)
             newOnlineStreams += QString(" - %1\n").arg(stream.name);
 
     if(!newOnlineStreams.isEmpty())
         tray->showMessage(NEW_ONLINE_STREAMS_TITLE, NEW_ONLINE_STREAMS_NOTIFICATION.arg(newOnlineStreams));
 
     streamTable->buildTable(streams);
+}
+
+void MainUi::notifyStreamMonitoringResponse(const QVariant & data)
+{
+    QVariantList dataList(data.toList());
+    QString streamName(dataList.at(0).toString());
+    bool accepted(dataList.at(1).toBool());
+
+    if(accepted)
+        QMessageBox::information(this, "Wut", QString("%1 is now monitored").arg(streamName));
+    else
+        QMessageBox::critical(this, "Not Wut", QString("Server refused to monitor %1").arg(streamName));
 }
 
 
@@ -146,6 +160,8 @@ void MainUi::closeEvent(QCloseEvent * event)
 
 void MainUi::on_ui_poll_clicked()
 {
+    if(ui_urlEdit->text().isEmpty())
+        return;
     // Disabling polling capabilities
     WidgetDisabler disabler(ui_poll);
 
@@ -171,6 +187,18 @@ void MainUi::on_ui_poll_clicked()
                                                    streamOnline));
     if(streamOnline)
         buildClientActionWidget(qualities);
+}
+
+void MainUi::on_ui_addToMonitored_clicked()
+{
+    bool accepted;
+    QString streamName(QInputDialog::getText(this, "Stream name", "Enter a name for the stream", QLineEdit::Normal, QString(), &accepted));
+
+    if(accepted)
+    {
+        socket->sendPacket(StreamMonitoringRequest, QVariantList() << ui_urlEdit->text() << streamName);
+        ui_statusBar->showMessage("Waiting for server's monitoring approval");
+    }
 }
 
 void MainUi::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
@@ -207,16 +235,21 @@ void MainUi::startStream(const QString & url, const QString & quality)
                      this, SLOT(onReadyReadStandardOutput()));
     QObject::connect(commandProcess, SIGNAL(readyReadStandardError()),
                      this, SLOT(onReadyReadStandardError()));
-    commandProcess->write(START_LIVESTREAMER_COMMAND.arg(url, quality, mediaPlayerPath));
+    QString command(START_LIVESTREAMER_COMMAND_DEFAULT.arg(url, quality, mediaPlayerPath));
+    if(url.contains(GOM_URL_TOKEN))
+        command += GOM_ARGS.arg(gomAccount.username, gomAccount.password);
+    commandProcess->write(command);
 }
 
 void MainUi::onConnected()
 {
+    ui_addToMonitored->setEnabled(true);
     tray->showMessage(QString(), CONNECTED_TO_HOST.arg(hostAddress).arg(port));
 }
 
 void MainUi::onDisconnected()
 {
+    ui_addToMonitored->setDisabled(true);
     tray->showMessage(QString(), LOST_CONNECTION);
 }
 
@@ -226,6 +259,10 @@ void MainUi::onPacketReceived(quint16 packetType, const QVariant & content)
     {
         case StreamsUpdate :
             unPackStream(content);
+            break;
+
+        case StreamMonitoringResponse :
+            notifyStreamMonitoringResponse(content);
             break;
 
         default :
@@ -263,4 +300,23 @@ void MainUi::on_ui_a_showOfflineStreams_triggered(bool enabled)
 {
     streamTable->setShowOfflinePages(enabled);
     streamTable->rebuildTable();
+}
+
+void MainUi::on_ui_a_Non_Monitored_Streams_triggered(bool enabled)
+{
+    streamTable->setShowNonMonitoredPages(enabled);
+    streamTable->rebuildTable();
+}
+
+void MainUi::on_ui_a_gomTV_triggered(bool)
+{
+    bool changeValue;
+    AccountInfo account = GomTVAccountDialog::getGomAccountInfo(gomAccount, changeValue);
+    if(changeValue)
+    {
+        gomAccount = account;
+        confs.insert(CACHE_KEY_GOM_USERNAME, gomAccount.username);
+        confs.insert(CACHE_KEY_GOM_PASSWORD, gomAccount.password);
+        writeConfFile(PROJECT_NAME, confs);
+    }
 }

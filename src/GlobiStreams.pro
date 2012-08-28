@@ -19,7 +19,7 @@ HEADERS += ChatBrowser.h \
            StreamActionWidget.h \
            StreamTable.h \
            SystemTray.h
-FORMS += GStreamUi.ui HostDialogUi.ui PathDialogUi.ui
+FORMS += GStreamUi.ui HostDialogUi.ui PathDialogUi.ui GomTVDialogUi.ui
 SOURCES += ChatBrowser.cpp \
            CommandProcess.cpp \
            Dialogs.cpp \

@@ -8,9 +8,6 @@ ChatBrowser::ChatBrowser(QWidget * parent) : QTabWidget(parent)
 
     QObject::connect(this, SIGNAL(tabCloseRequested(int)),
                      this, SLOT(onTabCloseRequested(int)));
-
-    QObject::connect(this, SIGNAL(linkClicked(const QUrl &)),
-                     this, SLOT(onLinkClicked(const QUrl &)));
 }
 
 ChatBrowser::~ChatBrowser()
@@ -36,11 +33,14 @@ void ChatBrowser::openChat(const QString & streamUrl, const QString & streamName
     
     // Adding new tab with chat
     QWebView * newPage = new QWebView();
+    QObject::connect(newPage, SIGNAL(linkClicked(const QUrl &)),
+                     this, SLOT(onLinkClicked(const QUrl &)));
     CookieJar * jar = new CookieJar(_cookies);
     jars << jar;
     newPage->page()->networkAccessManager()->setCookieJar(jar);
     newPage->settings()->setAttribute(QWebSettings::PluginsEnabled, true);
     newPage->setUrl(QUrl(chatUrl));
+    newPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     webPages << newPage;
 
     addTab(newPage, streamName);
@@ -54,6 +54,7 @@ void ChatBrowser::mouseReleaseEvent(QMouseEvent * event)
     if(tabIndexPressed != -1)
         if(event->button() == Qt::MiddleButton)
             onTabCloseRequested(tabIndexPressed);
+    QTabWidget::mouseReleaseEvent(event);
 }
 
 void ChatBrowser::onTabCloseRequested(int index)

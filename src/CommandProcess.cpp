@@ -5,10 +5,6 @@ void CommandProcess::init()
     // Starting MS-DOS
     start(WINDOWS_CMD_PROCESS);
     waitForStarted();
-
-    // Moving to LiveStreamer directory
-    write(CHANGE_DIRECTORY_COMMAND.arg(LIVE_STREAMER_PATH));
-    waitForReadyRead();
 }
 
 void CommandProcess::end()

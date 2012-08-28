@@ -5,15 +5,22 @@
 #include <QSize>
 #include <QColor>
 
+enum StreamState
+{
+    Online,
+    Offline,
+    UnWatched
+};
+
 struct Stream
 {
     QString name;
     QString url;
-    bool online;
+    int online;
     QStringList qualities;
 
     Stream(const QString & _name, const QString & _url) : 
-        name(_name), url(_url), online(false) { }
+        name(_name), url(_url), online(Offline) { }
 };
 
 typedef QList <Stream> StreamList;
@@ -24,15 +31,19 @@ static const quint16 DEFAULT_HOST_PORT(1337);
 
 enum PacketType
 {
-    StreamsUpdate // StreamList
+    StreamsUpdate, // StreamList
+    StreamMonitoringRequest, // QString, QString
+    StreamMonitoringResponse, // QString, bool
 };
 
 /* LiveStreamer */
 static const QString LIVE_STREAMER_PATH("C:\\Python27\\Lib\\site-packages\\livestreamer-1.1.0-py2.7.egg");
 static const QString POLLING_COMMAND("livestreamer %1 & exit\n");
-static const QString START_LIVESTREAMER_COMMAND("livestreamer %1 %2 --player \"\\\"%3\\\"\"\n");
+static const QString START_LIVESTREAMER_COMMAND_DEFAULT("livestreamer %1 %2 --player \"\\\"%3\\\"\"\n");
+static const QString GOM_ARGS(" --gomtv-username %1 --gomtv-password %2");
 static const QString OUTPUT_QUALITIES_LINE_BEGIN("Found streams: ");
 static const QString QUALITIES_SEPARATOR(", ");
+static const QString GOM_URL_TOKEN("gomtv.net");
 
 /* MS-DOS */
 static const QString WINDOWS_CMD_PROCESS("cmd");
@@ -44,13 +55,16 @@ static const int EXIT_TIMEOUT(200);
 static const QString APPLICATION_ICON(":/GlobiStreams/Icon");
 static const QColor ONLINE_COLOR("lime");
 static const QColor OFFLINE_COLOR("red");
+static const QColor UNWATCHED_COLOR("orange");
 static const int MINIMUM_TABLE_SECTION_SIZE(50);
 
 /* Cache */
 static const QString PROJECT_NAME("GlobiStream");
 static const QString CACHE_KEY_PLAYER_PATH("MediaPlayer"); // -> QString
 static const QString DEFAULT_PLAYER_PATH("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe");
-static const QString CACHE_KEY_COOKIES("Cookies");
+static const QString CACHE_KEY_COOKIES("Cookies"); // -> QString
+static const QString CACHE_KEY_GOM_USERNAME("Gom username"); // -> QString
+static const QString CACHE_KEY_GOM_PASSWORD("Gom password"); // -> QString
 static const QString CACHE_COOKIES_NAME_VALUE_SPEARATOR("|||");
 static const QString CACHE_COOKIES_SEPARATOR(";;;");
 
@@ -61,6 +75,7 @@ static const QSize TWITCH_CHAT_MINIMUM_SIZE(250, 330);
 /* Displayed strings */
 static const QString ONLINE_STATE("Online");
 static const QString OFFLINE_STATE("Offline");
+static const QString UNWATCHED_STATE("Not monitored");
 static const QString URL_RICH_TEXT_TEMPLATE("<a href=\"%1\">%1</a>");
 static const QString NEW_ONLINE_STREAMS_TITLE("Wut");
 static const QString NEW_ONLINE_STREAMS_NOTIFICATION("New streams are now live :\n%1");

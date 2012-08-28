@@ -43,6 +43,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="ui_addToMonitored">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Monitor</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -97,6 +107,8 @@
     <addaction name="ui_a_netProperties"/>
     <addaction name="ui_a_mediaPlayer"/>
     <addaction name="ui_a_showOfflineStreams"/>
+    <addaction name="ui_a_Non_Monitored_Streams"/>
+    <addaction name="ui_a_gomTV"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOptions"/>
@@ -170,6 +182,25 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="ui_a_Non_Monitored_Streams">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Non-Monitored Streams</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="ui_a_gomTV">
+   <property name="text">
+    <string>GomTV account</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
    </property>
   </action>
  </widget>

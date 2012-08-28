@@ -5,6 +5,9 @@
 #include <GlobiUtils>
 #include <QProgressBar>
 #include <QTextBrowser>
+#include <QDir>
+#include <QInputDialog>
+#include <QMessageBox>
 
 #include "StreamTable.h"
 #include "ChatBrowser.h"
@@ -29,6 +32,7 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         void setUpConnections();
 
         void unPackStream(const QVariant & data);
+        void notifyStreamMonitoringResponse(const QVariant & data);
         void buildClientActionWidget(const QStringList & qualities);
         void saveCookies();
 
@@ -40,9 +44,12 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         void on_ui_a_netProperties_triggered(bool);
         void on_ui_a_mediaPlayer_triggered(bool);
         void on_ui_a_showOfflineStreams_triggered(bool);
+        void on_ui_a_Non_Monitored_Streams_triggered(bool);
+        void on_ui_a_gomTV_triggered(bool);
 
         // GUI user interactions
         void on_ui_poll_clicked();
+        void on_ui_addToMonitored_clicked();
         void onChatFloatingRequested(bool);
         void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
         void onTrayMessageClicked() { show(); }
@@ -67,6 +74,8 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         // Core
         CommandProcess * commandProcess;
         QString mediaPlayerPath;
+
+        AccountInfo gomAccount;
 
         GLobiTcpSocket * socket;
         QString hostAddress;

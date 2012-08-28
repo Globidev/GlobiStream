@@ -35,7 +35,8 @@ class StreamTable : public QTableWidget
         void buildTable(const StreamList & streams);
         void rebuildTable() { buildTable(streamsCache); }
         void setShowOfflinePages(bool show) { showOfflinePages = show; }
-        QMap <QString, bool> lastStates() const { return _lastStates; }
+        void setShowNonMonitoredPages(bool show) { showNonMonitoredPaged = show; }
+        QMap <QString, int> lastStates() const { return _lastStates; }
 
     private slots :
         void onWatchClicked(const QString & url, const QString & quality) { emit watchClicked(url, quality); }
@@ -47,7 +48,8 @@ class StreamTable : public QTableWidget
 
     private :
         bool showOfflinePages;
+        bool showNonMonitoredPaged;
         StreamList streamsCache;
-        QMap <QString, bool> _lastStates;
+        QMap <QString, int> _lastStates;
 };
 #endif // STREAMTABLE_H

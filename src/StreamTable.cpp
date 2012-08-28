@@ -11,7 +11,7 @@ void UrlLabel::onLinkActivated(const QString & url)
     QDesktopServices::openUrl(QUrl(url));
 }
 
-StreamTable::StreamTable(QWidget * parent) : QTableWidget(parent), showOfflinePages(false)
+StreamTable::StreamTable(QWidget * parent) : QTableWidget(parent), showOfflinePages(false), showNonMonitoredPaged(false)
 {
     setColumnCount(COLUMN_COUNT);
     setHorizontalHeaderLabels(TABLE_HEADER_LABELS);
@@ -29,8 +29,23 @@ void StreamTable::buildTable(const StreamList & streams)
 
     foreach(const Stream & stream, streams)
     {
-        if(stream.online || showOfflinePages)
-            shown << stream;
+        switch(stream.online)
+        {
+            case Online :
+                shown << stream;
+                break;
+
+            case Offline :
+                if(showOfflinePages) shown << stream;
+                break;
+
+            case UnWatched :
+                if(showNonMonitoredPaged) shown << stream;
+                break;
+
+            default :
+                break;
+        }
         _lastStates.insert(stream.url, stream.online);
     }
 
@@ -42,9 +57,29 @@ void StreamTable::buildTable(const StreamList & streams)
         QTableWidgetItem * streamNameItem = new QTableWidgetItem(stream.name);
 
         UrlLabel * urlLabel = new UrlLabel(stream.url);
+        QString state; QColor color;
+        switch(stream.online)
+        {
+            case Online :
+                state = ONLINE_STATE;
+                color = ONLINE_COLOR;
+                break;
 
-        QTableWidgetItem * statusItem = new QTableWidgetItem(stream.online ? ONLINE_STATE : OFFLINE_STATE);
-        statusItem->setBackgroundColor(stream.online ? ONLINE_COLOR : OFFLINE_COLOR);
+            case Offline :
+                state = OFFLINE_STATE;
+                color = OFFLINE_COLOR;
+                break;
+
+            case UnWatched :
+                state = UNWATCHED_STATE;
+                color = UNWATCHED_COLOR;
+                break;
+
+            default :
+                break;
+        }
+        QTableWidgetItem * statusItem = new QTableWidgetItem(state);
+        statusItem->setBackgroundColor(color);
 
         StreamActionWidget * actionWidget = new StreamActionWidget(stream.qualities, stream.url, stream.name);
         QObject::connect(actionWidget, SIGNAL(watchClicked(const QString &, const QString &)),

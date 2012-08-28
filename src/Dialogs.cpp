@@ -32,12 +32,13 @@ void HostChangerDialog::onAccepted()
     values.hostAddress = ui_inputAddress->text();
     values.port = ui_inputPort->value();
 }
+
 void HostChangerDialog::onRejected() 
 { 
     setResult(QDialog::Rejected);
 }
 
-PathChangerDialog::PathChangerDialog(const QString & _path)
+PathChangerDialog::PathChangerDialog(const QString & _path) : QDialog()
 {
     UiPathDialog::setupUi(this);
     ui_inputPath->setText(_path);
@@ -80,4 +81,41 @@ void PathChangerDialog::onBrowse()
     QString path = QFileDialog::getOpenFileName(0, QString(), ui_inputPath->text());
     if(!path.isEmpty())
         ui_inputPath->setText(path);
+}
+
+GomTVAccountDialog::GomTVAccountDialog(const QString & gomUsername, const QString & gomPassword) : QDialog()
+{
+    UiGomTVDialog::setupUi(this);
+    ui_gomUsername->setText(gomUsername);
+    ui_gomPassword->setText(gomPassword);
+
+    connect(ui_promptValidator, SIGNAL(accepted()),
+            this,               SLOT(onAccepted()));
+
+    connect(ui_promptValidator, SIGNAL(rejected()),
+            this,               SLOT(onRejected()));
+}
+
+GomTVAccountDialog::~GomTVAccountDialog()
+{
+
+}
+
+void GomTVAccountDialog::onAccepted() 
+{ 
+    setResult(QDialog::Accepted);
+    account.username = ui_gomUsername->text();
+    account.password = ui_gomPassword->text();
+}
+void GomTVAccountDialog::onRejected() 
+{ 
+    setResult(QDialog::Rejected);
+}
+
+AccountInfo GomTVAccountDialog::getGomAccountInfo(const AccountInfo & account, bool & accepted)
+{
+    GomTVAccountDialog dialog(account.username, account.password);
+    dialog.exec();
+    accepted = (dialog.result() == QDialog::Accepted);
+    return dialog.account;
 }
