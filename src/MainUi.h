@@ -14,6 +14,8 @@
 #include "CommandProcess.h"
 #include "Dialogs.h"
 #include "SystemTray.h"
+#include "Event.h"
+#include "EventTable.h"
 #include "ui_GStreamUi.h"
 
 using namespace GlobiNetwork;
@@ -32,6 +34,7 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         void setUpConnections();
 
         void unPackStream(const QVariant & data);
+        void unPackEvents(const QVariant & data);
         void notifyStreamMonitoringResponse(const QVariant & data);
         void buildClientActionWidget(const QStringList & qualities);
         void saveCookies();
@@ -46,6 +49,7 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         void on_ui_a_showOfflineStreams_triggered(bool);
         void on_ui_a_Non_Monitored_Streams_triggered(bool);
         void on_ui_a_gomTV_triggered(bool);
+        void on_ui_a_about_triggered(bool);
 
         // GUI user interactions
         void on_ui_poll_clicked();
@@ -66,6 +70,7 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         // GUI
         SystemTray * tray;
         StreamTable * streamTable;
+        EventTable * eventTable;
         ChatBrowser * chatBrowser;
         QTextBrowser * outputConsole;
         StreamActionWidget * clientSideStreamAction;

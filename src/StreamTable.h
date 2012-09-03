@@ -17,6 +17,7 @@ class UrlLabel : public QLabel
     Q_OBJECT
 
     public :
+        UrlLabel();
         UrlLabel(const QString & text);
         ~UrlLabel() { }
 

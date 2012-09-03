@@ -18,7 +18,7 @@ class CommandProcess : public QProcess
         void init();
         void end();
         void restart() { end(); init(); }
-        void write(const QString & command) { QIODevice::write(command.toStdString().c_str()); }
+        void write(const QString & command) { QIODevice::write(QString("%1\n").arg(command).toStdString().c_str()); }
         void waitForComputingFinished();
 };
 

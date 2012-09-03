@@ -41,3 +41,25 @@ bool operator==(const Stream & lValue, const Stream & rValue)
 {
     return (lValue.url == rValue.url);
 }
+
+const QString stateString(int state)
+{
+    switch(state)
+    {
+        case Online :       return ONLINE_STATE;    break;
+        case Offline :      return OFFLINE_STATE;   break;
+        case UnWatched :    return UNWATCHED_STATE; break;
+        default :           return QString();       break;
+    }
+}
+
+const QColor stateColor(int state)
+{
+    switch(state)
+    {
+        case Online :       return ONLINE_COLOR;    break;
+        case Offline :      return OFFLINE_COLOR;   break;
+        case UnWatched :    return UNWATCHED_COLOR; break;
+        default :           return QColor();        break;
+    }
+}

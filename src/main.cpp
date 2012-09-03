@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
     QtSingleApplication a(argc, argv);
-
+    qRegisterMetaTypeStreamOperators<Event>("Event");
     if(a.isRunning())
     {
         a.sendMessage(QString());

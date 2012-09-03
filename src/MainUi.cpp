@@ -32,6 +32,7 @@ void MainUi::init()
 
     tray = new SystemTray();
     streamTable = new StreamTable();
+    eventTable = new EventTable();
     chatBrowser = new ChatBrowser();
     outputConsole = new QTextBrowser();
     clientSideStreamAction = NULL;
@@ -39,6 +40,7 @@ void MainUi::init()
     ui_dockChat->setWidget(chatBrowser);
     ui_dockOutput->setWidget(outputConsole);
     ui_mainLayout->addWidget(streamTable);
+    ui_eventTableLayout->addWidget(eventTable);
 
     // Core
     commandProcess = new CommandProcess();
@@ -127,6 +129,14 @@ void MainUi::unPackStream(const QVariant & data)
     streamTable->buildTable(streams);
 }
 
+void MainUi::unPackEvents(const QVariant & data)
+{
+    QList <Event> events;
+    foreach(const QVariant & event, data.toList())
+        events << event.value<Event>();
+    eventTable->buildTable(events);
+}
+
 void MainUi::notifyStreamMonitoringResponse(const QVariant & data)
 {
     QVariantList dataList(data.toList());
@@ -178,7 +188,11 @@ void MainUi::on_ui_poll_clicked()
     ui_singleStreamLayout->addWidget(&bar);
 
     commandProcess->restart();
-    commandProcess->write(POLLING_COMMAND.arg(ui_urlEdit->text()));
+    QString command(POLLING_COMMAND.arg(ui_urlEdit->text()));
+    if(ui_urlEdit->text().contains(GOM_URL_TOKEN))
+        command += GOM_ARGS.arg(gomAccount.username, gomAccount.password);
+    command += EXIT_COMMAND_ADD;
+    commandProcess->write(command);
     commandProcess->waitForComputingFinished();
     
     // Parsing results
@@ -265,6 +279,10 @@ void MainUi::onPacketReceived(quint16 packetType, const QVariant & content)
             notifyStreamMonitoringResponse(content);
             break;
 
+        case EventsUpdate :
+            unPackEvents(content);
+            break;
+
         default :
             break;
     }
@@ -319,4 +337,9 @@ void MainUi::on_ui_a_gomTV_triggered(bool)
         confs.insert(CACHE_KEY_GOM_PASSWORD, gomAccount.password);
         writeConfFile(PROJECT_NAME, confs);
     }
+}
+
+void MainUi::on_ui_a_about_triggered(bool)
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/Globicodeur/GlobiStream"));
 }

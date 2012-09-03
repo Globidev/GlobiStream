@@ -1,9 +1,17 @@
 #include "StreamTable.h"
 
-UrlLabel::UrlLabel(const QString & text): QLabel(URL_RICH_TEXT_TEMPLATE.arg(text))
+UrlLabel::UrlLabel() : QLabel()
 {
     QObject::connect(this, SIGNAL(linkActivated(const QString &)),
                      this, SLOT(onLinkActivated(const QString &)));
+    setWordWrap(true);
+}
+
+UrlLabel::UrlLabel(const QString & text): QLabel(URL_RICH_TEXT_TEMPLATE.arg(text, text))
+{
+    QObject::connect(this, SIGNAL(linkActivated(const QString &)),
+                     this, SLOT(onLinkActivated(const QString &)));
+    setWordWrap(true);
 }
 
 void UrlLabel::onLinkActivated(const QString & url)
@@ -19,6 +27,7 @@ StreamTable::StreamTable(QWidget * parent) : QTableWidget(parent), showOfflinePa
     verticalHeader()->setMinimumSectionSize(MINIMUM_TABLE_SECTION_SIZE);
     verticalHeader()->setDefaultSectionSize(MINIMUM_TABLE_SECTION_SIZE);
     horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    setSelectionMode(QAbstractItemView::NoSelection);
 }
 
 void StreamTable::buildTable(const StreamList & streams)
@@ -31,20 +40,10 @@ void StreamTable::buildTable(const StreamList & streams)
     {
         switch(stream.online)
         {
-            case Online :
-                shown << stream;
-                break;
-
-            case Offline :
-                if(showOfflinePages) shown << stream;
-                break;
-
-            case UnWatched :
-                if(showNonMonitoredPaged) shown << stream;
-                break;
-
-            default :
-                break;
+            case Online :                                 shown << stream; break;
+            case Offline :      if(showOfflinePages)      shown << stream; break;
+            case UnWatched :    if(showNonMonitoredPaged) shown << stream; break;
+            default :                                                      break;
         }
         _lastStates.insert(stream.url, stream.online);
     }
@@ -57,29 +56,8 @@ void StreamTable::buildTable(const StreamList & streams)
         QTableWidgetItem * streamNameItem = new QTableWidgetItem(stream.name);
 
         UrlLabel * urlLabel = new UrlLabel(stream.url);
-        QString state; QColor color;
-        switch(stream.online)
-        {
-            case Online :
-                state = ONLINE_STATE;
-                color = ONLINE_COLOR;
-                break;
-
-            case Offline :
-                state = OFFLINE_STATE;
-                color = OFFLINE_COLOR;
-                break;
-
-            case UnWatched :
-                state = UNWATCHED_STATE;
-                color = UNWATCHED_COLOR;
-                break;
-
-            default :
-                break;
-        }
-        QTableWidgetItem * statusItem = new QTableWidgetItem(state);
-        statusItem->setBackgroundColor(color);
+        QTableWidgetItem * statusItem = new QTableWidgetItem(stateString(stream.online));
+        statusItem->setBackgroundColor(stateColor(stream.online));
 
         StreamActionWidget * actionWidget = new StreamActionWidget(stream.qualities, stream.url, stream.name);
         QObject::connect(actionWidget, SIGNAL(watchClicked(const QString &, const QString &)),
