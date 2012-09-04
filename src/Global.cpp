@@ -42,7 +42,7 @@ bool operator==(const Stream & lValue, const Stream & rValue)
     return (lValue.url == rValue.url);
 }
 
-const QString stateString(int state)
+QString stateString(int state)
 {
     switch(state)
     {
@@ -53,7 +53,7 @@ const QString stateString(int state)
     }
 }
 
-const QColor stateColor(int state)
+QColor stateColor(int state)
 {
     switch(state)
     {

@@ -89,7 +89,7 @@ static const QString LOST_CONNECTION("Lost connection to server");
 QStringList parseQualitiesFromOutput(const QString & output, bool & online);
 QString twitchChatFromUrl(const QString & url);
 bool operator==(const Stream & lValue, const Stream & rValue);
-const QString stateString(int state);
-const QColor stateColor(int state);
+QString stateString(int state);
+QColor stateColor(int state);
 
 #endif // GLOBAL_H

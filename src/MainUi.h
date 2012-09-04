@@ -16,6 +16,7 @@
 #include "SystemTray.h"
 #include "Event.h"
 #include "EventTable.h"
+#include "AddEventDialog.h"
 #include "ui_GStreamUi.h"
 
 using namespace GlobiNetwork;
@@ -36,6 +37,7 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         void unPackStream(const QVariant & data);
         void unPackEvents(const QVariant & data);
         void notifyStreamMonitoringResponse(const QVariant & data);
+        void notifyEventAddingResponse(const QVariant & data);
         void buildClientActionWidget(const QStringList & qualities);
         void saveCookies();
 
@@ -57,6 +59,7 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         void onChatFloatingRequested(bool);
         void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
         void onTrayMessageClicked() { show(); }
+        void on_ui_addEvent_clicked();
 
         // Core Events
         void startStream(const QString & url, const QString & quality);

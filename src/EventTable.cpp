@@ -9,6 +9,8 @@ EventTable::EventTable(QWidget * parent) : QTableWidget(parent)
     verticalHeader()->setDefaultSectionSize(MINIMUM_TABLE_SECTION_SIZE);
     horizontalHeader()->setResizeMode(QHeaderView::Stretch);
     setSelectionMode(QAbstractItemView::NoSelection);
+
+    setMouseTracking(true);
 }
 
 void EventTable::buildTable(const QList <Event> & events)
@@ -45,4 +47,39 @@ void EventTable::buildTable(const QList <Event> & events)
          
         setCellWidget(i, 3, linkLabel);
     }
+}
+
+void EventTable::mouseMoveEvent(QMouseEvent * event)
+{
+    QTableWidgetItem * item(itemAt(event->pos()));
+    if(item)
+    {
+        if(item->column() == 1)
+        {
+            QDate b, e;
+            QString rangeString(item->text());
+            rangeString.remove("From \n");
+            rangeString.replace(" \nto \n",";");
+            QStringList dateString(rangeString.split(";"));
+            qDebug() << dateString;
+
+            b = QDate::fromString(dateString.at(0));
+            e = QDate::fromString(dateString.at(1));
+            qDebug() << b << e;
+
+            w.setDateRange(b, e);
+            QDate it(b);
+            QTextCharFormat f;
+            f.setBackground(QBrush(QColor("aqua")));
+            while(it < e)
+            {
+                w.setDateTextFormat(it, f);
+                it = it.addDays(1);
+            }
+            w.move(QApplication::overrideCursor()->pos());
+            w.show();
+            return;
+        }
+    }
+     w.hide();
 }

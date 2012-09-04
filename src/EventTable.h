@@ -1,9 +1,12 @@
 #ifndef EVENTTABLE_H
 #define EVENTTABLE_H
 
+#include <QCalendarWidget>
+#include <QApplication>
+#include <QTextCharFormat>
+#include <QMouseEvent>
 #include "StreamTable.h"
 #include "Event.h"
-#include <QScrollBar>
 
 static const int EVENT_COLUMN_COUNT(4);
 static const QStringList EVENT_HEADER_LABELS(QStringList() << "Event Name" << "Period" << "Streams" << "Links");
@@ -18,9 +21,10 @@ class EventTable : public QTableWidget
         ~EventTable() { }
 
         void buildTable(const QList <Event> & events);
+        void mouseMoveEvent(QMouseEvent * event);
 
     private :
-
+        QCalendarWidget w;
 
 };
 

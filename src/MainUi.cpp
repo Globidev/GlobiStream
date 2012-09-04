@@ -149,6 +149,18 @@ void MainUi::notifyStreamMonitoringResponse(const QVariant & data)
         QMessageBox::critical(this, "Not Wut", QString("Server refused to monitor %1").arg(streamName));
 }
 
+void MainUi::notifyEventAddingResponse(const QVariant & data)
+{
+    QVariantList dataList(data.toList());
+    QString eventName(dataList.at(0).toString());
+    bool accepted(dataList.at(1).toBool());
+
+    if(accepted)
+        QMessageBox::information(this, "Wut", QString("%1 was added").arg(eventName));
+    else
+        QMessageBox::critical(this, "Not Wut", QString("Server refused to add %1").arg(eventName));
+}
+
 
 void MainUi::buildClientActionWidget(const QStringList & qualities)
 {
@@ -224,6 +236,17 @@ void MainUi::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
+void MainUi::on_ui_addEvent_clicked()
+{
+    bool added;
+    Event e(AddEventDialog::getEvent(added));
+    if(added)
+    {
+        socket->sendPacket(EventAddingRequest, QVariant::fromValue(e));
+        ui_statusBar->showMessage("Waiting for server's monitoring approval");
+    }
+}
+
 void MainUi::onChatFloatingRequested(bool floating)
 {
     // Disabling recursive call of this slots
@@ -277,10 +300,16 @@ void MainUi::onPacketReceived(quint16 packetType, const QVariant & content)
 
         case StreamMonitoringResponse :
             notifyStreamMonitoringResponse(content);
+            ui_statusBar->clearMessage();
             break;
 
         case EventsUpdate :
             unPackEvents(content);
+            break;
+
+        case EventAddingResponse :
+
+            ui_statusBar->clearMessage();
             break;
 
         default :
