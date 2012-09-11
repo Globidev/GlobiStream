@@ -3,7 +3,7 @@
 ChatBrowser::ChatBrowser(QWidget * parent) : QTabWidget(parent)
 {
     // Twitch chat popup requires a minimum size
-    setMinimumSize(TWITCH_CHAT_MINIMUM_SIZE);
+    //setMinimumSize(TWITCH_CHAT_MINIMUM_SIZE);
     setTabsClosable(true);
 
     QObject::connect(this, SIGNAL(tabCloseRequested(int)),

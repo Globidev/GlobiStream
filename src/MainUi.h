@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QSplitter>
 
 #include "StreamTable.h"
 #include "ChatBrowser.h"
@@ -17,6 +18,7 @@
 #include "Event.h"
 #include "EventTable.h"
 #include "AddEventDialog.h"
+#include "CustomCalendar.h"
 #include "ui_GStreamUi.h"
 
 using namespace GlobiNetwork;
@@ -60,6 +62,7 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         void onTrayActivated(QSystemTrayIcon::ActivationReason reason);
         void onTrayMessageClicked() { show(); }
         void on_ui_addEvent_clicked();
+        void onChangeEvent(const Event & event, int eventIndex);
 
         // Core Events
         void startStream(const QString & url, const QString & quality);
@@ -74,6 +77,7 @@ class MainUi : public QMainWindow, public Ui::UiGStream
         SystemTray * tray;
         StreamTable * streamTable;
         EventTable * eventTable;
+        CustomCalendar * eventCalendar;
         ChatBrowser * chatBrowser;
         QTextBrowser * outputConsole;
         StreamActionWidget * clientSideStreamAction;

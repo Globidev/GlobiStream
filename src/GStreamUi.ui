@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1111</width>
-    <height>625</height>
+    <width>1401</width>
+    <height>812</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -24,7 +24,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -102,6 +102,13 @@
         <item>
          <layout class="QVBoxLayout" name="ui_eventTableLayout">
           <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Current Events :</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
              <widget class="QPushButton" name="ui_addEvent">
@@ -136,13 +143,6 @@
             </item>
            </layout>
           </item>
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Current Events :</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
        </layout>
@@ -157,7 +157,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1111</width>
+     <width>1401</width>
      <height>21</height>
     </rect>
    </property>

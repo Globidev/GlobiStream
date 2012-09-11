@@ -33,6 +33,7 @@ void MainUi::init()
     tray = new SystemTray();
     streamTable = new StreamTable();
     eventTable = new EventTable();
+    eventCalendar = new CustomCalendar();
     chatBrowser = new ChatBrowser();
     outputConsole = new QTextBrowser();
     clientSideStreamAction = NULL;
@@ -40,7 +41,10 @@ void MainUi::init()
     ui_dockChat->setWidget(chatBrowser);
     ui_dockOutput->setWidget(outputConsole);
     ui_mainLayout->addWidget(streamTable);
-    ui_eventTableLayout->addWidget(eventTable);
+    QSplitter * splitter = new QSplitter(Qt::Vertical);
+    splitter->addWidget(eventCalendar);
+    splitter->addWidget(eventTable);
+    ui_eventTableLayout->insertWidget(1, splitter);
 
     // Core
     commandProcess = new CommandProcess();
@@ -75,6 +79,9 @@ void MainUi::setUpConnections()
                      this, SLOT(startStream(const QString &, const QString &)));
     QObject::connect(streamTable, SIGNAL(chatClicked(const QString &, const QString &)),
                      chatBrowser, SLOT(openChat(const QString &, const QString &)));
+
+    QObject::connect(eventTable, SIGNAL(changeEvent(const Event &, int)),
+                     this, SLOT(onChangeEvent(const Event &, int)));
 
     QObject::connect(ui_dockChat, SIGNAL(topLevelChanged(bool)),
                      this, SLOT(onChatFloatingRequested(bool)));
@@ -135,6 +142,8 @@ void MainUi::unPackEvents(const QVariant & data)
     foreach(const QVariant & event, data.toList())
         events << event.value<Event>();
     eventTable->buildTable(events);
+    tray->extractSchedules(events);
+    eventCalendar->setEvents(events);
 }
 
 void MainUi::notifyStreamMonitoringResponse(const QVariant & data)
@@ -245,6 +254,14 @@ void MainUi::on_ui_addEvent_clicked()
         socket->sendPacket(EventAddingRequest, QVariant::fromValue(e));
         ui_statusBar->showMessage("Waiting for server's monitoring approval");
     }
+}
+
+void MainUi::onChangeEvent(const Event & event, int index)
+{
+    bool changed;
+    Event changedEvent(AddEventDialog::getEvent(changed, event));
+    if(changed)
+        socket->sendPacket(EventChangementRequest, QVariantList() << index << QVariant::fromValue(changedEvent));
 }
 
 void MainUi::onChatFloatingRequested(bool floating)

@@ -4,10 +4,12 @@
 
 #include "CalendarDialog.h"
 #include "Event.h"
+#include "ScheduleDialog.h"
 #include "ui_AddEventDialogUi.h"
 #include "ui_DoubleStringDialogUi.h"
 
 #include <QInputDialog>
+#include <QColorDialog>
 
 class AddEventDialog : public QDialog, public Ui::UiAddEventDialog
 {
@@ -28,9 +30,13 @@ class AddEventDialog : public QDialog, public Ui::UiAddEventDialog
         void onRemoveStream();
         void onAddLink();
         void onRemoveLink(); 
+        void onAddSchedule();
+        void onRemoveSchedule();
+        void on_ui_color_clicked();
 
     private :
         Event _event;
+        QColor _color;
 };
 
 class DoubleStringDialog : public QDialog, public Ui::UiDoubleStringDialog

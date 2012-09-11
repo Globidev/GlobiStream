@@ -1,7 +1,6 @@
 #ifndef EVENTTABLE_H
 #define EVENTTABLE_H
 
-#include <QCalendarWidget>
 #include <QApplication>
 #include <QTextCharFormat>
 #include <QMouseEvent>
@@ -21,11 +20,15 @@ class EventTable : public QTableWidget
         ~EventTable() { }
 
         void buildTable(const QList <Event> & events);
-        void mouseMoveEvent(QMouseEvent * event);
+
+    signals :
+        void changeEvent(const Event & event, int eventIndex);
+
+    private slots :
+        void onEventEditRequested();
 
     private :
-        QCalendarWidget w;
-
+        QList <Event> _events;
 };
 
 #endif // EVENTTABLE_H

@@ -2,8 +2,8 @@
 
 EventTable::EventTable(QWidget * parent) : QTableWidget(parent)
 {
-    setColumnCount(EVENT_COLUMN_COUNT);
-    setHorizontalHeaderLabels(EVENT_HEADER_LABELS);
+    setColumnCount(5);
+    setHorizontalHeaderLabels(QStringList() << EVENT_HEADER_LABELS << "Edit");
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     verticalHeader()->setMinimumSectionSize(MINIMUM_TABLE_SECTION_SIZE);
     verticalHeader()->setDefaultSectionSize(MINIMUM_TABLE_SECTION_SIZE);
@@ -15,16 +15,22 @@ EventTable::EventTable(QWidget * parent) : QTableWidget(parent)
 
 void EventTable::buildTable(const QList <Event> & events)
 {
+    _events = events;
     setRowCount(events.size());
 
     for(int i(0); i < events.size(); ++ i)
     {
         const Event & event = events.at(i);
         QTableWidgetItem * eventName = new QTableWidgetItem(event.name());
-        QTableWidgetItem * dateName = new QTableWidgetItem(dateString.arg(event.beginDate().toString(), event.endDate().toString()));
+        eventName->setBackground(QBrush(event.color()));
+        QTableWidgetItem * dateName = new QTableWidgetItem(dateString.arg(event.beginDate().toString("dd/MM/yyyy"), event.endDate().toString("dd/MM/yyyy")));
 
         UrlLabel * streamLabel = new UrlLabel();
         UrlLabel * linkLabel = new UrlLabel();
+
+        QPushButton * editButton = new QPushButton("Edit");
+        connect(editButton, SIGNAL(clicked()),
+                this, SLOT(onEventEditRequested()));
         
 
         foreach(const QUrl & url, event.streamsUrls())
@@ -46,40 +52,19 @@ void EventTable::buildTable(const QList <Event> & events)
         setCellWidget(i, 2, streamLabel);
          
         setCellWidget(i, 3, linkLabel);
+        setCellWidget(i, 4, editButton);
     }
 }
 
-void EventTable::mouseMoveEvent(QMouseEvent * event)
+void EventTable::onEventEditRequested()
 {
-    QTableWidgetItem * item(itemAt(event->pos()));
-    if(item)
+    QPushButton * buttonSender = qobject_cast <QPushButton *> (sender());
+    for(int i(0); i < rowCount(); ++ i)
     {
-        if(item->column() == 1)
+        if(cellWidget(i, 4) == buttonSender)
         {
-            QDate b, e;
-            QString rangeString(item->text());
-            rangeString.remove("From \n");
-            rangeString.replace(" \nto \n",";");
-            QStringList dateString(rangeString.split(";"));
-            qDebug() << dateString;
-
-            b = QDate::fromString(dateString.at(0));
-            e = QDate::fromString(dateString.at(1));
-            qDebug() << b << e;
-
-            w.setDateRange(b, e);
-            QDate it(b);
-            QTextCharFormat f;
-            f.setBackground(QBrush(QColor("aqua")));
-            while(it < e)
-            {
-                w.setDateTextFormat(it, f);
-                it = it.addDays(1);
-            }
-            w.move(QApplication::overrideCursor()->pos());
-            w.show();
-            return;
+            emit changeEvent(_events.at(i), i);
+            break;
         }
     }
-     w.hide();
 }

@@ -1,7 +1,7 @@
 #include "Event.h"
 
 Event::Event(const QString & name, const QDate & beginDate, const QDate & endDate) :
-    _name(name), _beginDate(beginDate), _endDate(endDate)
+    _name(name), _beginDate(beginDate), _endDate(endDate), _isNull(false)
 {
 
 }
@@ -26,6 +26,8 @@ void Event::copy(const Event & other)
     _links = other._links;
     _streamsUrls = other._streamsUrls;
     _schedules = other._schedules;
+    _color = other._color;
+    _isNull = other._isNull;
 }
 
 QDomElement Event::toXmlElement() const
@@ -36,6 +38,7 @@ QDomElement Event::toXmlElement() const
     eventElement.setAttribute(XML_EVENT_ATTR_NAME, _name);
     eventElement.setAttribute(XML_EVENT_ATTR_BEGIN_DATE, _beginDate.toString());
     eventElement.setAttribute(XML_EVENT_ATTR_END_DATE, _endDate.toString());
+    eventElement.setAttribute(XML_EVENT_ATTR_COLOR, _color.name());
 
     // Links
     QDomElement linksElement(document.createElement(XML_TAG_LINKS));
@@ -81,8 +84,10 @@ Event Event::fromXmlElement(const QDomElement & eventElement)
     QString name(eventElement.attribute(XML_EVENT_ATTR_NAME));
     QDate beginDate(QDate::fromString(eventElement.attribute(XML_EVENT_ATTR_BEGIN_DATE)));
     QDate endDate(QDate::fromString(eventElement.attribute(XML_EVENT_ATTR_END_DATE)));
+    QColor color(QColor(eventElement.attribute(XML_EVENT_ATTR_COLOR)));
 
     Event event(name, beginDate, endDate);
+    event.setColor(color);
 
     // Links
     QDomElement linksElement(eventElement.firstChildElement(XML_TAG_LINKS));
@@ -105,7 +110,8 @@ Event Event::fromXmlElement(const QDomElement & eventElement)
 QDataStream & operator<<(QDataStream & out, const Event & event)
 {
     out << event.name() << event.beginDate() << event.endDate()
-        << event.links() << event.streamsUrls() << event.schedules();
+        << event.links() << event.streamsUrls() << event.schedules()
+        << event.color();
     return out;
 }
 
@@ -116,10 +122,12 @@ QDataStream & operator>>(QDataStream & in, Event & event)
     QMap <QUrl, QString> links;
     QList <QUrl> streamsUrls; 
     QMap <QDateTime, QString> schedules;
+    QColor color;
 
-    in >> name >> beginDate >> endDate >> links >> streamsUrls >> schedules;
+    in >> name >> beginDate >> endDate >> links >> streamsUrls >> schedules >> color;
 
     Event e(name, beginDate, endDate);
+    e.setColor(color);
     QMapIterator <QUrl, QString> it(links);
     while(it.hasNext())
     {

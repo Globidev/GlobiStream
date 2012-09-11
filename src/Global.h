@@ -36,7 +36,8 @@ enum PacketType
     StreamMonitoringResponse, // QString, bool
     EventsUpdate, // Event
     EventAddingRequest, // Event
-    EventAddingResponse // QString, bool
+    EventAddingResponse, // QString, bool
+    EventChangementRequest // int, Event
 };
 
 /* LiveStreamer */

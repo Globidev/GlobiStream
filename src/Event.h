@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QDomDocument>
 #include <QDebug>
+#include <QColor>
 
 static const QString XML_TAG_EVENTS("events");
 static const QString XML_TAG_EVENT("event");
@@ -19,12 +20,13 @@ static const QString XML_TAG_SCHEDULE("schedule");
 static const QString XML_EVENT_ATTR_NAME("name");
 static const QString XML_EVENT_ATTR_BEGIN_DATE("begin");
 static const QString XML_EVENT_ATTR_END_DATE("end");
+static const QString XML_EVENT_ATTR_COLOR("color");
 static const QString XML_ATTR_DESCRIPTION("description");
 
 class Event
 {
     public :
-        Event() { }
+        Event() : _isNull(true) { }
         Event(const QString & name, 
               const QDate & beginDate,
               const QDate & endDate);
@@ -37,7 +39,8 @@ class Event
         void addSchedule(const QDateTime & schedule, 
                          const QString & description) { _schedules.insert(schedule, description); }
         void addLink(const QUrl & link, 
-                     const QString & description) { _links.insert(link, description); }
+                     const QString & description) { _links.insertMulti(link, description); }
+        void setColor(const QColor & color) { _color = color; }
 
         QDomElement toXmlElement() const;
         static Event fromXmlElement(const QDomElement & eventElement);
@@ -47,7 +50,9 @@ class Event
         QDate endDate() const { return _endDate; }
         QMap <QUrl, QString> links() const { return _links; }
         QList <QUrl> streamsUrls() const { return _streamsUrls; }
-        QMap <QDateTime, QString> schedules() const { return _schedules; }     
+        QMap <QDateTime, QString> schedules() const { return _schedules; }   
+        QColor color() const { return _color; }
+        bool isNull() const { return _isNull; }
 
     private :
         QString _name;
@@ -55,6 +60,8 @@ class Event
         QMap <QUrl, QString> _links;
         QList <QUrl> _streamsUrls; 
         QMap <QDateTime, QString> _schedules;
+        QColor _color;
+        bool _isNull;
 };
 
 Q_DECLARE_METATYPE(Event);
