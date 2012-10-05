@@ -7,19 +7,14 @@ that you can find here : https://github.com/chrippa/livestreamer
 It is necessary to install Livestreamer before building Globistream.
 You will also need Qt 4.8 to build the project.
 
-GlobiStream connects to a server that monitors a given list of streams, checking
-every minute to see if they are online or not. The server application is not available
-yet but I'll create a new repository when I'm not too busy.
-
-By default, it connects to the server application running on my computer which monitors
-some streams already. You can suggest the server to monitor the streams of your choice.
-
+GlobiStream connects to the server application which monitors a given list of streams, checking
+every minute to see if they are online or not.
 
 Installation
 ------------------------
 
-qmake
-make release
+- qmake
+- make release
 
 This should suffice to build GlobiStream.
 You can find the dynamic dependencies in the "libs" folder.

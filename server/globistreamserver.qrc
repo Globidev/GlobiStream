@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/GlobiStreamServer">
+        <file alias="Icon">Resources/Icone.png</file>
+    </qresource>
+</RCC>
